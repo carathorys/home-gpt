@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/home-gpt/home-gpt.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/home-gpt-tests/home-gpt-tests.csproj" />
+  </Folder>
+</Solution>

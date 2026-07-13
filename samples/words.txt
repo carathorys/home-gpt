@@ -1,0 +1,18 @@
+# One word per line (lowercase a-z). Used to train the character model.
+hello
+help
+hero
+heron
+world
+word
+work
+worm
+warm
+warn
+wave
+water
+cat
+car
+card
+care
+careful
