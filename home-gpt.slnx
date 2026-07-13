@@ -1,8 +1,12 @@
 <Solution>
   <Folder Name="/src/">
-    <Project Path="src/home-gpt/home-gpt.csproj" />
+    <Project Path="src/home-gpt.Core/home-gpt.Core.csproj" />
+    <Project Path="src/home-gpt.Cli/home-gpt.Cli.csproj" />
+    <Project Path="src/home-gpt.Avalonia/home-gpt.Avalonia.csproj" />
   </Folder>
   <Folder Name="/tests/">
-    <Project Path="tests/home-gpt-tests/home-gpt-tests.csproj" />
+    <Project Path="tests/home-gpt.Core.Tests/home-gpt.Core.Tests.csproj" />
+    <Project Path="tests/home-gpt.Cli.Tests/home-gpt.Cli.Tests.csproj" />
+    <Project Path="tests/home-gpt.Avalonia.Tests/home-gpt.Avalonia.Tests.csproj" />
   </Folder>
 </Solution>

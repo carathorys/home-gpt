@@ -7,13 +7,27 @@ Interactive console app for training and sampling a **character-level LSTM word 
 - .NET 10 (`net10.0`)
 - TorchSharp 0.106.0 with `TorchSharp-cuda-linux` (uses CUDA when available, otherwise CPU)
 
+## Project structure
+
+| Project | Path | Role |
+|---------|------|------|
+| **home-gpt.Core** | [`src/home-gpt.Core`](src/home-gpt.Core) | Model, training, inference, persistence (UI-agnostic) |
+| **home-gpt.Cli** | [`src/home-gpt.Cli`](src/home-gpt.Cli) | Spectre.Console interactive shell |
+| **home-gpt.Avalonia** | [`src/home-gpt.Avalonia`](src/home-gpt.Avalonia) | Avalonia desktop UI scaffold (placeholder) |
+
+Each project has a matching test project under [`tests/`](tests/).
+
 ## Build and run
 
 ```bash
 dotnet build home-gpt.slnx
-dotnet run --project src/home-gpt
-dotnet test
+dotnet run --project src/home-gpt.Cli
+dotnet run --project src/home-gpt.Avalonia
+dotnet test home-gpt.slnx
+./scripts/verify-coverage.sh
 ```
+
+The coverage script runs all tests and verifies **≥ 80% line coverage** per component (`Core`, `Cli`, `Avalonia`).
 
 ## Data format
 
