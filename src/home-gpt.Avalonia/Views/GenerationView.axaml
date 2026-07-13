@@ -1,0 +1,31 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:home_gpt.Avalonia.ViewModels"
+             x:Class="home_gpt.Avalonia.Views.GenerationView"
+             x:DataType="vm:GenerationViewModel">
+  <StackPanel Margin="16" Spacing="12">
+    <TextBlock Text="Generate words" FontSize="18" FontWeight="Bold" />
+    <TextBlock Text="Enter prefixes to complete words." />
+
+    <TextBlock Text="Model directory" />
+    <Grid ColumnDefinitions="*,Auto">
+      <TextBox Grid.Column="0" Text="{Binding ModelDirectory}" />
+      <Button Grid.Column="1" Content="Browse" Command="{Binding BrowseModelDirectoryCommand}" Margin="8,0,0,0" />
+    </Grid>
+
+    <TextBlock Text="Prefix" />
+    <TextBox Text="{Binding Prefix}" PlaceholderText="Enter prefix (empty allowed)" />
+
+    <TextBlock Text="Temperature" />
+    <NumericUpDown Value="{Binding Temperature}" Minimum="0" Maximum="5" Increment="0.1" FormatString="F1" />
+
+    <Button Content="Generate" Command="{Binding GenerateCommand}" HorizontalAlignment="Left" />
+
+    <TextBlock Text="{Binding StatusMessage}" Foreground="Red" TextWrapping="Wrap" />
+    <TextBlock Text="Generated:" FontWeight="SemiBold" />
+    <TextBlock Text="{Binding GeneratedWord}" FontSize="16" />
+
+    <TextBlock Text="History" FontWeight="SemiBold" />
+    <ListBox ItemsSource="{Binding History}" Height="240" />
+  </StackPanel>
+</UserControl>

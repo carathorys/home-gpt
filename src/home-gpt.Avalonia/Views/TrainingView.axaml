@@ -1,0 +1,62 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:home_gpt.Avalonia.ViewModels"
+             x:Class="home_gpt.Avalonia.Views.TrainingView"
+             x:DataType="vm:TrainingViewModel">
+  <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,*,Auto,Auto" Margin="16" ColumnSpacing="16" RowSpacing="12">
+    <TextBlock Grid.ColumnSpan="2" Text="Training configuration" FontSize="18" FontWeight="Bold" />
+
+    <StackPanel Grid.Row="1" Grid.Column="0" Spacing="8">
+      <TextBlock Text="{Binding EpochsFieldLabel}" />
+      <NumericUpDown Value="{Binding Epochs}" Minimum="1" Maximum="100000" />
+
+      <TextBlock Text="Data file" />
+      <Grid ColumnDefinitions="*,Auto">
+        <TextBox Grid.Column="0" Text="{Binding DataPath}" PlaceholderText="Select a word list" />
+        <Button Grid.Column="1" Content="Browse" Command="{Binding BrowseDataPathCommand}" Margin="8,0,0,0" />
+      </Grid>
+
+      <TextBlock Text="Output directory" />
+      <Grid ColumnDefinitions="*,Auto">
+        <TextBox Grid.Column="0" Text="{Binding OutputDirectory}" />
+        <Button Grid.Column="1" Content="Browse" Command="{Binding BrowseOutputDirectoryCommand}" Margin="8,0,0,0" />
+      </Grid>
+
+      <TextBlock Text="Batch size" />
+      <NumericUpDown Value="{Binding BatchSize}" Minimum="1" Maximum="100000" />
+
+      <TextBlock Text="Learning rate" />
+      <NumericUpDown Value="{Binding LearningRate}" Minimum="0.000001" Maximum="1" Increment="0.001" FormatString="G" />
+
+      <TextBlock Text="Hidden layer size" />
+      <NumericUpDown Value="{Binding HiddenSize}" Minimum="1" Maximum="100000" />
+
+      <TextBlock Text="Embedding size" />
+      <NumericUpDown Value="{Binding EmbedSize}" Minimum="1" Maximum="100000" />
+
+      <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,8,0,0">
+        <Button Content="Start training" Command="{Binding StartTrainingCommand}" />
+        <Button Content="Cancel training" Command="{Binding CancelTrainingCommand}" />
+      </StackPanel>
+
+      <TextBlock Text="{Binding ValidationError}" Foreground="Red" TextWrapping="Wrap" />
+      <TextBlock Text="{Binding StatusMessage}" TextWrapping="Wrap" />
+    </StackPanel>
+
+    <StackPanel Grid.Row="1" Grid.Column="1" Spacing="8">
+      <TextBlock Text="Training preview" FontWeight="SemiBold" />
+      <DataGrid ItemsSource="{Binding PreviewRows}" IsReadOnly="True" AutoGenerateColumns="False" Height="420">
+        <DataGrid.Columns>
+          <DataGridTextColumn Header="Setting" Binding="{Binding Label}" Width="*" />
+          <DataGridTextColumn Header="Value" Binding="{Binding Value}" Width="*" />
+        </DataGrid.Columns>
+      </DataGrid>
+    </StackPanel>
+
+    <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Spacing="4" IsVisible="{Binding IsTraining}">
+      <TextBlock Text="{Binding TrainingStatus}" />
+      <ProgressBar Minimum="0" Maximum="100" Value="{Binding TrainingProgress}" Height="16" />
+      <TextBlock Text="Press Cancel training to stop and return to configuration." FontStyle="Italic" />
+    </StackPanel>
+  </Grid>
+</UserControl>

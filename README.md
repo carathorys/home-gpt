@@ -13,7 +13,7 @@ Interactive console app for training and sampling a **character-level LSTM word 
 |---------|------|------|
 | **home-gpt.Core** | [`src/home-gpt.Core`](src/home-gpt.Core) | Model, training, inference, persistence (UI-agnostic) |
 | **home-gpt.Cli** | [`src/home-gpt.Cli`](src/home-gpt.Cli) | Spectre.Console interactive shell |
-| **home-gpt.Avalonia** | [`src/home-gpt.Avalonia`](src/home-gpt.Avalonia) | Avalonia desktop UI scaffold (placeholder) |
+| **home-gpt.Avalonia** | [`src/home-gpt.Avalonia`](src/home-gpt.Avalonia) | Avalonia desktop UI (feature parity with CLI) |
 
 Each project has a matching test project under [`tests/`](tests/).
 
@@ -28,6 +28,11 @@ dotnet test home-gpt.slnx
 ```
 
 The coverage script runs all tests and verifies **≥ 80% line coverage** per component (`Core`, `Cli`, `Avalonia`).
+
+The Avalonia app mirrors the CLI:
+
+- **Train model** — live preview, checkpoint resume/overwrite prompts, hyperparameter editing, cancellable training with progress
+- **Generate words** — model directory selection, prefix input, temperature control, generation history
 
 ## Data format
 

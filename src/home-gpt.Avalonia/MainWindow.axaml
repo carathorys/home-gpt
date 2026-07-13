@@ -1,9 +1,28 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        xmlns:views="using:home_gpt.Avalonia.Views"
+        xmlns:vm="using:home_gpt.Avalonia.ViewModels"
         x:Class="home_gpt.Avalonia.MainWindow"
-        Title="home-gpt">
-    <TextBlock Text="home-gpt Avalonia UI (placeholder)" HorizontalAlignment="Center" VerticalAlignment="Center" />
+        x:DataType="vm:MainViewModel"
+        Title="home-gpt"
+        Width="1100"
+        Height="720"
+        MinWidth="900"
+        MinHeight="600">
+  <DockPanel Margin="12">
+    <StackPanel DockPanel.Dock="Top" Spacing="4" Margin="0,0,0,12">
+      <TextBlock Text="home-gpt" FontSize="24" FontWeight="Bold" />
+      <TextBlock Text="TorchSharp character-level word model" Opacity="0.7" />
+      <TextBlock Text="{Binding DeviceStatus}" />
+    </StackPanel>
+
+    <TabControl SelectedIndex="{Binding SelectedTabIndex}">
+      <TabItem Header="Train model">
+        <views:TrainingView DataContext="{Binding Training}" />
+      </TabItem>
+      <TabItem Header="Generate words">
+        <views:GenerationView DataContext="{Binding Generation}" />
+      </TabItem>
+    </TabControl>
+  </DockPanel>
 </Window>
