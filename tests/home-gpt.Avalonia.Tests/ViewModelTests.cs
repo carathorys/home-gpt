@@ -77,6 +77,16 @@ public sealed class GenerationViewModelTests
     }
 
     [Fact]
+    public void Prefix_CanBeSetForGeneration()
+    {
+        using var vm = new GenerationViewModel(new FakeFileDialogService());
+
+        vm.Prefix = "hel";
+
+        Assert.Equal("hel", vm.Prefix);
+    }
+
+    [Fact]
     public void Generate_ProducesWordFromSavedModel()
     {
         var outputDirectory = Path.Combine(Path.GetTempPath(), $"home-gpt-ui-{Guid.NewGuid():N}");

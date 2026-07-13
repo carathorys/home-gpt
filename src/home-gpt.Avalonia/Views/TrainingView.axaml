@@ -3,7 +3,7 @@
              xmlns:vm="using:home_gpt.Avalonia.ViewModels"
              x:Class="home_gpt.Avalonia.Views.TrainingView"
              x:DataType="vm:TrainingViewModel">
-  <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,*,Auto,Auto" Margin="16" ColumnSpacing="16" RowSpacing="12">
+  <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,*" Margin="16" ColumnSpacing="16" RowSpacing="12">
     <TextBlock Grid.ColumnSpan="2" Text="Training configuration" FontSize="18" FontWeight="Bold" />
 
     <StackPanel Grid.Row="1" Grid.Column="0" Spacing="8">
@@ -12,13 +12,13 @@
 
       <TextBlock Text="Data file" />
       <Grid ColumnDefinitions="*,Auto">
-        <TextBox Grid.Column="0" Text="{Binding DataPath}" PlaceholderText="Select a word list" />
+        <TextBox Grid.Column="0" Text="{Binding DataPath, Mode=TwoWay}" PlaceholderText="Select a word list" />
         <Button Grid.Column="1" Content="Browse" Command="{Binding BrowseDataPathCommand}" Margin="8,0,0,0" />
       </Grid>
 
       <TextBlock Text="Output directory" />
       <Grid ColumnDefinitions="*,Auto">
-        <TextBox Grid.Column="0" Text="{Binding OutputDirectory}" />
+        <TextBox Grid.Column="0" Text="{Binding OutputDirectory, Mode=TwoWay}" />
         <Button Grid.Column="1" Content="Browse" Command="{Binding BrowseOutputDirectoryCommand}" Margin="8,0,0,0" />
       </Grid>
 
@@ -36,8 +36,21 @@
 
       <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,8,0,0">
         <Button Content="Start training" Command="{Binding StartTrainingCommand}" />
-        <Button Content="Cancel training" Command="{Binding CancelTrainingCommand}" />
+        <Button Content="Cancel training" Command="{Binding CancelTrainingCommand}" IsEnabled="{Binding IsTraining}" />
       </StackPanel>
+
+      <Border IsVisible="{Binding IsTraining}"
+              Background="#11000000"
+              CornerRadius="4"
+              Padding="8"
+              Margin="0,4,0,0">
+        <StackPanel Spacing="6">
+          <TextBlock Text="Training progress" FontWeight="SemiBold" />
+          <TextBlock Text="{Binding TrainingStatus}" TextWrapping="Wrap" />
+          <ProgressBar Minimum="0" Maximum="100" Value="{Binding TrainingProgress}" Height="18" />
+          <TextBlock Text="{Binding TrainingProgress, StringFormat={}{0:F0}% complete}" Opacity="0.8" />
+        </StackPanel>
+      </Border>
 
       <TextBlock Text="{Binding ValidationError}" Foreground="Red" TextWrapping="Wrap" />
       <TextBlock Text="{Binding StatusMessage}" TextWrapping="Wrap" />
@@ -53,10 +66,5 @@
       </DataGrid>
     </StackPanel>
 
-    <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Spacing="4" IsVisible="{Binding IsTraining}">
-      <TextBlock Text="{Binding TrainingStatus}" />
-      <ProgressBar Minimum="0" Maximum="100" Value="{Binding TrainingProgress}" Height="16" />
-      <TextBlock Text="Press Cancel training to stop and return to configuration." FontStyle="Italic" />
-    </StackPanel>
   </Grid>
 </UserControl>

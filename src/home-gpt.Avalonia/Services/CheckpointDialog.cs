@@ -9,8 +9,6 @@ namespace home_gpt.Avalonia.Services;
 [ExcludeFromCodeCoverage]
 public sealed class CheckpointDialog : Window
 {
-    private readonly TaskCompletionSource<TrainingStartChoice?> _result = new();
-
     public CheckpointDialog(CheckpointPromptKind kind, string outputDirectory)
     {
         Title = "Checkpoint";
@@ -39,11 +37,6 @@ public sealed class CheckpointDialog : Window
             }
         };
 
-        Closing += (_, e) =>
-        {
-            if (!_result.Task.IsCompleted)
-                _result.TrySetResult(TrainingStartChoice.Cancel);
-        };
     }
 
     private Control BuildButtons(CheckpointPromptKind kind)
@@ -68,11 +61,7 @@ public sealed class CheckpointDialog : Window
     private Button CreateButton(string text, TrainingStartChoice choice)
     {
         var button = new Button { Content = text };
-        button.Click += (_, _) =>
-        {
-            _result.TrySetResult(choice);
-            Close();
-        };
+        button.Click += (_, _) => Close(choice);
         return button;
     }
 }

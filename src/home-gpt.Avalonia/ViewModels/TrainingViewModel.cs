@@ -13,6 +13,7 @@ public partial class TrainingViewModel : ViewModelBase
     private readonly IFileDialogService _fileDialogs;
     private readonly ICheckpointDialogService _checkpointDialog;
     private CancellationTokenSource? _trainingCts;
+    private bool _isSyncingFromState;
 
     public TrainingViewModel(IFileDialogService fileDialogs, ICheckpointDialogService checkpointDialog)
     {
@@ -63,13 +64,47 @@ public partial class TrainingViewModel : ViewModelBase
 
     public ObservableCollection<PreviewRow> PreviewRows { get; } = [];
 
-    partial void OnDataPathChanged(string? value) => UpdateState();
-    partial void OnOutputDirectoryChanged(string value) => UpdateState(reloadCheckpoint: true);
-    partial void OnEpochsChanged(int value) => UpdateState();
-    partial void OnBatchSizeChanged(int value) => UpdateState();
-    partial void OnLearningRateChanged(double value) => UpdateState();
-    partial void OnHiddenSizeChanged(int value) => UpdateState();
-    partial void OnEmbedSizeChanged(int value) => UpdateState();
+    partial void OnDataPathChanged(string? value)
+    {
+        if (!_isSyncingFromState)
+            UpdateState();
+    }
+
+    partial void OnOutputDirectoryChanged(string value)
+    {
+        if (!_isSyncingFromState)
+            UpdateState(reloadCheckpoint: true);
+    }
+
+    partial void OnEpochsChanged(int value)
+    {
+        if (!_isSyncingFromState)
+            UpdateState();
+    }
+
+    partial void OnBatchSizeChanged(int value)
+    {
+        if (!_isSyncingFromState)
+            UpdateState();
+    }
+
+    partial void OnLearningRateChanged(double value)
+    {
+        if (!_isSyncingFromState)
+            UpdateState();
+    }
+
+    partial void OnHiddenSizeChanged(int value)
+    {
+        if (!_isSyncingFromState)
+            UpdateState();
+    }
+
+    partial void OnEmbedSizeChanged(int value)
+    {
+        if (!_isSyncingFromState)
+            UpdateState();
+    }
 
     [RelayCommand]
     private async Task BrowseDataPathAsync()
@@ -104,8 +139,17 @@ public partial class TrainingViewModel : ViewModelBase
         if (promptKind != CheckpointPromptKind.None)
         {
             var choice = await _checkpointDialog.PromptAsync(promptKind, OutputDirectory);
-            if (choice is null || !TrainingStartResolver.TryApplyChoice(_state, choice.Value))
+            if (choice is null)
+            {
+                StatusMessage = "Training cancelled.";
                 return;
+            }
+
+            if (!TrainingStartResolver.TryApplyChoice(_state, choice.Value))
+            {
+                StatusMessage = "Training cancelled.";
+                return;
+            }
         }
 
         await RunTrainingAsync();
@@ -151,14 +195,22 @@ public partial class TrainingViewModel : ViewModelBase
 
     private void SyncFromState()
     {
-        DataPath = _state.DataPath;
-        OutputDirectory = _state.OutputDirectory;
-        Epochs = _state.Epochs;
-        BatchSize = _state.BatchSize;
-        LearningRate = _state.LearningRate;
-        HiddenSize = _state.HiddenSize;
-        EmbedSize = _state.EmbedSize;
-        EpochsFieldLabel = _state.EpochsLabel;
+        _isSyncingFromState = true;
+        try
+        {
+            DataPath = _state.DataPath;
+            OutputDirectory = _state.OutputDirectory;
+            Epochs = _state.Epochs;
+            BatchSize = _state.BatchSize;
+            LearningRate = _state.LearningRate;
+            HiddenSize = _state.HiddenSize;
+            EmbedSize = _state.EmbedSize;
+            EpochsFieldLabel = _state.EpochsLabel;
+        }
+        finally
+        {
+            _isSyncingFromState = false;
+        }
     }
 
     private void RefreshPreview()
@@ -166,6 +218,16 @@ public partial class TrainingViewModel : ViewModelBase
         PreviewRows.Clear();
         foreach (var row in TrainingPreviewRows.Build(_state))
             PreviewRows.Add(row);
+    }
+
+    internal void ApplyTrainingEpochProgress(
+        TrainingEpochProgress progress,
+        int epochsThisRun,
+        int previousCompleted)
+    {
+        var (percent, status) = TrainingProgressReporter.Format(progress, epochsThisRun, previousCompleted);
+        TrainingProgress = percent;
+        TrainingStatus = status;
     }
 
     private async Task RunTrainingAsync()
@@ -190,6 +252,8 @@ public partial class TrainingViewModel : ViewModelBase
                     _trainingCts.Token),
                 _trainingCts.Token);
 
+            TrainingProgress = 100;
+            TrainingStatus = $"Finished {result.CompletedEpochs} epoch(s).";
             StatusMessage =
                 $"Training complete. Model saved to {result.OutputDirectory} ({result.CompletedEpochs} total epochs).";
             _state.TryLoadCheckpointFromOutputDirectory();
@@ -209,8 +273,11 @@ public partial class TrainingViewModel : ViewModelBase
             _trainingCts?.Dispose();
             _trainingCts = null;
             IsTraining = false;
-            TrainingProgress = 0;
-            TrainingStatus = string.Empty;
+            if (!StatusMessage.StartsWith("Training complete", StringComparison.Ordinal))
+            {
+                TrainingProgress = 0;
+                TrainingStatus = string.Empty;
+            }
         }
     }
 
@@ -220,13 +287,9 @@ public partial class TrainingViewModel : ViewModelBase
     {
         public void OnEpochCompleted(TrainingEpochProgress progress)
         {
-            global::Avalonia.Threading.Dispatcher.UIThread.Post(() =>
-            {
-                var completedThisRun = progress.CurrentEpoch - previousCompleted;
-                vm.TrainingProgress = completedThisRun / (double)epochsThisRun * 100;
-                vm.TrainingStatus =
-                    $"Epoch {progress.CurrentEpoch}/{progress.TotalEpochs}  loss={progress.AverageLoss:G6}";
-            });
+            global::Avalonia.Threading.Dispatcher.UIThread.Post(
+                () => vm.ApplyTrainingEpochProgress(progress, epochsThisRun, previousCompleted),
+                global::Avalonia.Threading.DispatcherPriority.Background);
         }
     }
 }

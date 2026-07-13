@@ -9,12 +9,18 @@
 
     <TextBlock Text="Model directory" />
     <Grid ColumnDefinitions="*,Auto">
-      <TextBox Grid.Column="0" Text="{Binding ModelDirectory}" />
+      <TextBox Grid.Column="0" Text="{Binding ModelDirectory, Mode=TwoWay}" />
       <Button Grid.Column="1" Content="Browse" Command="{Binding BrowseModelDirectoryCommand}" Margin="8,0,0,0" />
     </Grid>
 
     <TextBlock Text="Prefix" />
-    <TextBox Text="{Binding Prefix}" PlaceholderText="Enter prefix (empty allowed)" />
+    <TextBox Text="{Binding Prefix, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+             PlaceholderText="Enter prefix (empty allowed)"
+             AcceptsReturn="False">
+      <TextBox.KeyBindings>
+        <KeyBinding Gesture="Enter" Command="{Binding GenerateCommand}" />
+      </TextBox.KeyBindings>
+    </TextBox>
 
     <TextBlock Text="Temperature" />
     <NumericUpDown Value="{Binding Temperature}" Minimum="0" Maximum="5" Increment="0.1" FormatString="F1" />
